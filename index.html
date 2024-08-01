@@ -1,69 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Audio Loop</title>
-<style>
-  body {
-    background-color: #1a1a1a; /* Dark background */
-    color: #f0f0f0; /* Light text */
-    font-family: Arial, sans-serif;
-    text-align: center; /* Center content */
-    padding-top: 20px; /* Add some space at the top */
-  }
-
-  audio {
-    margin: 20px 0; /* Add some space around the audio element */
-  }
-
-  .text-content {
-    text-align: left;
-    margin: 20px;
-    font-size: 34px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Progress Bar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #progress-container {
+            width: 80%;
+            height: 30px;
+            background-color: #ddd;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: green;
+            transition: width 0.5s, background-color 0.5s;
+        }
+        #message {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
 
-<audio id="myAudio" loop controls>
-  <source src="The_Living_Christ.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+    <h1>Learning Progress</h1>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="message"></div>
 
-<div class="text-content">
-    <p>As we commemorate the birth of Jesus Christ two millennia ago, we offer our testimony of the reality of His matchless life and the infinite virtue of His great atoning sacrifice. None other has had so profound an influence upon all who have lived and will yet live upon the earth.</p>
+    <script>
+        let progress = 0;
+        const progressBar = document.getElementById('progress-bar');
+        const message = document.getElementById('message');
 
-    <p>He was the Great Jehovah of the Old Testament, the Messiah of the New. Under the direction of His Father, He was the creator of the earth. “All things were made by him; and without him was not any thing made that was made.” Though sinless, He was baptized to fulfill all righteousness. He “went about doing good,” yet was despised for it. His gospel was a message of peace and goodwill. He entreated all to follow His example. He walked the roads of Palestine, healing the sick, causing the blind to see, and raising the dead. He taught the truths of eternity, the reality of our premortal existence, the purpose of our life on earth, and the potential for the sons and daughters of God in the life to come.</p>
+        function updateProgress(change) {
+            progress += change;
+            if (progress > 100) progress = 100;
+            if (progress < 0) progress = 0;
 
-    <p>He instituted the sacrament as a reminder of His great atoning sacrifice. He was arrested and condemned on spurious charges, convicted to satisfy a mob, and sentenced to die on Calvary’s cross. He gave His life to atone for the sins of all mankind. His was a great vicarious gift in behalf of all who would ever live upon the earth.</p>
+            progressBar.style.width = progress + '%';
+            if (change > 0) {
+                progressBar.style.backgroundColor = 'green';
+                progressBar.classList.add('pulse-green');
+                message.textContent = 'Great job! Keep going!';
+            } else if (change < 0) {
+                progressBar.style.backgroundColor = 'red';
+                progressBar.classList.add('pulse-red');
+                message.textContent = 'Careful, focus!';
+            } else {
+                progressBar.style.backgroundColor = 'green';
+                message.textContent = '';
+            }
 
-    <p>We solemnly testify that His life, which is central to all human history, neither began in Bethlehem nor concluded on Calvary. He was the Firstborn of the Father, the Only Begotten Son in the flesh, the Redeemer of the world.</p>
+            setTimeout(() => {
+                progressBar.classList.remove('pulse-green');
+                progressBar.classList.remove('pulse-red');
+            }, 500);
+        }
 
-    <p>He rose from the grave to “become the firstfruits of them that slept.” As Risen Lord, He visited among those He had loved in life. He also ministered among His “other sheep” in ancient America. In the modern world, He and His Father appeared to the boy Joseph Smith, ushering in the long-promised “dispensation of the fulness of times.”</p>
-
-    <p>Of the Living Christ, the Prophet Joseph wrote: “His eyes were as a flame of fire; the hair of his head was white like the pure snow; his countenance shone above the brightness of the sun; and his voice was as the sound of the rushing of great waters, even the voice of Jehovah, saying:</p>
-
-    <p>“I am the first and the last; I am he who liveth, I am he who was slain; I am your advocate with the Father.”</p>
-
-    <p>Of Him the Prophet also declared: “And now, after the many testimonies which have been given of him, this is the testimony, last of all, which we give of him: That he lives!</p>
-
-    <p>“For we saw him, even on the right hand of God; and we heard the voice bearing record that he is the Only Begotten of the Father—</p>
-
-    <p>“That by him, and through him, and of him, the worlds are and were created, and the inhabitants thereof are begotten sons and daughters unto God.”</p>
-
-    <p>We declare in words of solemnity that His priesthood and His Church have been restored upon the earth—“built upon the foundation of … apostles and prophets, Jesus Christ himself being the chief corner stone.”</p>
-
-    <p>We testify that He will someday return to earth. “And the glory of the Lord shall be revealed, and all flesh shall see it together.” He will rule as King of Kings and reign as Lord of Lords, and every knee shall bend and every tongue shall speak in worship before Him. Each of us will stand to be judged of Him according to our works and the desires of our hearts.</p>
-
-    <p>We bear testimony, as His duly ordained Apostles—that Jesus is the Living Christ, the immortal Son of God. He is the great King Immanuel, who stands today on the right hand of His Father. He is the light, the life, and the hope of the world. His way is the path that leads to happiness in this life and eternal life in the world to come. God be thanked for the matchless gift of His divine Son.</p>
-</div>
-
-<script>
-window.onload = function() {
-  var audio = document.getElementById("myAudio");
-  audio.loop = true;
-  audio.play();
-};
-</script>
-
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case 'ArrowUp': // Map this to your remote's increase button
+                    updateProgress(10);
+                    break;
+                case 'ArrowDown': // Map this to your remote's decrease button
+                    updateProgress(-10);
+                    break;
+            }
+        });
+    </script>
 </body>
 </html>
