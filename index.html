@@ -16,6 +16,7 @@
             align-items: center;
             height: 100vh;
             background-color: #f0f0f0;
+            overflow: hidden; /* Prevent scrolling */
         }
         #progress-container {
             position: relative;
@@ -75,7 +76,7 @@
                 if (current === newValue) {
                     clearInterval(interval);
                 }
-            }, 10); // Adjust speed of the animation here
+            }, 50); // Slower animation speed
         }
 
         function updateProgress(change) {
@@ -109,10 +110,11 @@
 
         document.addEventListener('keydown', (event) => {
             switch (event.key) {
-                case ' ': // Spacebar increases points
+                case ' ':
+                    event.preventDefault(); // Prevent default spacebar behavior
                     updateProgress(5);
                     break;
-                case 'ArrowLeft': // Left arrow decreases points
+                case 'ArrowLeft':
                     updateProgress(-5);
                     break;
             }
