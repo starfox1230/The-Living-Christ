@@ -100,6 +100,7 @@
         function updateProgress(change) {
             const oldProgress = progress;
             progress += change;
+
             if (progress > 100) progress = 100;
             if (progress < 0) progress = 0;
 
@@ -135,14 +136,12 @@
         }
 
         document.addEventListener('keydown', (event) => {
-            switch (event.key) {
-                case ' ':
-                    event.preventDefault(); // Prevent default spacebar behavior
-                    updateProgress(5);
-                    break;
-                case 'ArrowLeft':
-                    updateProgress(-5);
-                    break;
+            if (progress < 100 && event.key === ' ') {
+                event.preventDefault(); // Prevent default spacebar behavior
+                updateProgress(5);
+            }
+            if (progress > 0 && event.key === 'ArrowLeft') {
+                updateProgress(-5);
             }
         });
     </script>
