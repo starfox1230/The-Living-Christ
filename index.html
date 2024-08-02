@@ -55,9 +55,9 @@
             100% { transform: scale(1); }
         }
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-5px, -5px) rotate(-5deg); }
+            75% { transform: translate(5px, 5px) rotate(5deg); }
         }
         .pulse {
             animation: pulse 0.5s ease-in-out;
@@ -69,12 +69,12 @@
 </head>
 <body>
 
-    <h1>Learning Progress</h1>
+    <h1 id="title">Learning Progress</h1>
     <div id="progress-container">
         <div id="progress-bar"></div>
         <div id="progress-text">0%</div>
     </div>
-    <div id="message"></div>
+    <div id="message">Keep going!</div>
 
     <script>
         let progress = 0;
@@ -83,6 +83,7 @@
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
         const progressContainer = document.getElementById('progress-container');
+        const title = document.getElementById('title');
 
         function animateProgress(oldValue, newValue) {
             const step = oldValue < newValue ? 1 : -1;
@@ -109,10 +110,14 @@
             if (change > 0) {
                 progressBar.style.backgroundColor = 'green';
                 progressContainer.classList.add('pulse');
+                title.classList.add('pulse');
+                message.classList.add('pulse');
                 message.textContent = 'Great job! Keep going!';
             } else if (change < 0) {
                 progressBar.style.backgroundColor = 'red';
                 progressContainer.classList.add('shake');
+                title.classList.add('shake');
+                message.classList.add('shake');
                 message.textContent = 'Careful, focus!';
             } else {
                 progressBar.style.backgroundColor = 'green';
@@ -121,7 +126,11 @@
 
             setTimeout(() => {
                 progressContainer.classList.remove('pulse');
+                title.classList.remove('pulse');
+                message.classList.remove('pulse');
                 progressContainer.classList.remove('shake');
+                title.classList.remove('shake');
+                message.classList.remove('shake');
             }, 500);
         }
 
