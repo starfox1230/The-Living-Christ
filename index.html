@@ -130,17 +130,18 @@
         }
 
         let keyPressed = false;
+        let intervalId;
 
         document.addEventListener('keydown', (event) => {
             if (!keyPressed) {
                 if (progress < 100 && event.key === ' ') {
                     event.preventDefault(); // Prevent default spacebar behavior
-                    updateProgress(5);
                     keyPressed = true;
+                    intervalId = setInterval(() => updateProgress(5), 100);
                 }
                 if (progress > 0 && event.key === 'ArrowLeft') {
-                    updateProgress(-5);
                     keyPressed = true;
+                    intervalId = setInterval(() => updateProgress(-5), 100);
                 }
             }
         });
@@ -148,6 +149,7 @@
         document.addEventListener('keyup', (event) => {
             if (event.key === ' ' || event.key === 'ArrowLeft') {
                 keyPressed = false;
+                clearInterval(intervalId);
                 progressContainer.classList.remove('pulse');
                 title.classList.remove('pulse');
                 message.classList.remove('pulse');
