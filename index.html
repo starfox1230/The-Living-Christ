@@ -26,7 +26,6 @@
             border-radius: 15px;
             overflow: hidden;
             margin: 20px 0;
-            transition: transform 0.5s;
         }
         #progress-bar {
             height: 100%;
@@ -49,18 +48,22 @@
         #message {
             font-size: 1.2em;
             margin-top: 20px;
-            transition: transform 0.5s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         @keyframes shake {
             0%, 100% { transform: translate(0); }
             25% { transform: translate(-5px, -5px) rotate(-5deg); }
             75% { transform: translate(5px, 5px) rotate(5deg); }
         }
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
         .shake {
             animation: shake 0.5s ease-in-out;
-        }
-        .pulse {
-            transform: scale(1.1);
         }
     </style>
 </head>
@@ -123,36 +126,22 @@
             }
 
             setTimeout(() => {
+                progressContainer.classList.remove('pulse');
+                title.classList.remove('pulse');
+                message.classList.remove('pulse');
                 progressContainer.classList.remove('shake');
                 title.classList.remove('shake');
                 message.classList.remove('shake');
             }, 500);
         }
 
-        let keyPressed = false;
-        let intervalId;
-
         document.addEventListener('keydown', (event) => {
-            if (!keyPressed) {
-                if (progress < 100 && event.key === ' ') {
-                    event.preventDefault(); // Prevent default spacebar behavior
-                    keyPressed = true;
-                    intervalId = setInterval(() => updateProgress(5), 100);
-                }
-                if (progress > 0 && event.key === 'ArrowLeft') {
-                    keyPressed = true;
-                    intervalId = setInterval(() => updateProgress(-5), 100);
-                }
+            if (progress < 100 && event.key === ' ') {
+                event.preventDefault(); // Prevent default spacebar behavior
+                updateProgress(5);
             }
-        });
-
-        document.addEventListener('keyup', (event) => {
-            if (event.key === ' ' || event.key === 'ArrowLeft') {
-                keyPressed = false;
-                clearInterval(intervalId);
-                progressContainer.classList.remove('pulse');
-                title.classList.remove('pulse');
-                message.classList.remove('pulse');
+            if (progress > 0 && event.key === 'ArrowLeft') {
+                updateProgress(-5);
             }
         });
     </script>
