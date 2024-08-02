@@ -49,6 +49,22 @@
             font-size: 1.2em;
             margin-top: 20px;
         }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -66,6 +82,7 @@
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
+        const progressContainer = document.getElementById('progress-container');
 
         function animateProgress(oldValue, newValue) {
             const step = oldValue < newValue ? 1 : -1;
@@ -91,11 +108,11 @@
 
             if (change > 0) {
                 progressBar.style.backgroundColor = 'green';
-                progressBar.classList.add('pulse-green');
+                progressContainer.classList.add('pulse');
                 message.textContent = 'Great job! Keep going!';
             } else if (change < 0) {
                 progressBar.style.backgroundColor = 'red';
-                progressBar.classList.add('pulse-red');
+                progressContainer.classList.add('shake');
                 message.textContent = 'Careful, focus!';
             } else {
                 progressBar.style.backgroundColor = 'green';
@@ -103,8 +120,8 @@
             }
 
             setTimeout(() => {
-                progressBar.classList.remove('pulse-green');
-                progressBar.classList.remove('pulse-red');
+                progressContainer.classList.remove('pulse');
+                progressContainer.classList.remove('shake');
             }, 500);
         }
 
