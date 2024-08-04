@@ -83,7 +83,6 @@
     <script>
         let progress = 0;
         let currentDisplayValue = 0;
-        let keyPressed = false;
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
@@ -144,31 +143,12 @@
         }
 
         document.addEventListener('keydown', (event) => {
-            if (!keyPressed) {
-                if (progress < 100 && event.key === ' ') {
-                    event.preventDefault(); // Prevent default spacebar behavior
-                    keyPressed = true;
-                    updateProgress(5);
-                    progressContainer.classList.add('pulse');
-                    title.classList.add('pulse');
-                    message.classList.add('pulse');
-                }
-                if (progress > 0 && event.key === 'ArrowLeft') {
-                    keyPressed = true;
-                    updateProgress(-5);
-                    progressContainer.classList.add('shake');
-                    title.classList.add('shake');
-                    message.classList.add('shake');
-                }
+            if (progress < 100 && event.key === ' ') {
+                event.preventDefault(); // Prevent default spacebar behavior
+                updateProgress(5);
             }
-        });
-
-        document.addEventListener('keyup', (event) => {
-            if (event.key === ' ' || event.key === 'ArrowLeft') {
-                keyPressed = false;
-                progressContainer.classList.remove('pulse');
-                title.classList.remove('pulse');
-                message.classList.remove('pulse');
+            if (progress > 0 && event.key === 'ArrowLeft') {
+                updateProgress(-5);
             }
         });
     </script>
