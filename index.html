@@ -30,7 +30,7 @@
         #progress-bar {
             height: 100%;
             width: 0;
-            background-color: #ff69b4; /* Hot pink */
+            background-color: hotpink;
             transition: width 0.5s, background-color 0.5s;
         }
         #progress-text {
@@ -76,7 +76,6 @@
     </div>
     <div id="message">Keep going!</div>
 
-    <!-- Add audio elements -->
     <audio id="ding-sound" src="Ding.m4a"></audio>
     <audio id="buzz-sound" src="Buzz.m4a"></audio>
 
@@ -88,8 +87,6 @@
         const message = document.getElementById('message');
         const progressContainer = document.getElementById('progress-container');
         const title = document.getElementById('title');
-
-        // Get audio elements
         const dingSound = document.getElementById('ding-sound');
         const buzzSound = document.getElementById('buzz-sound');
 
@@ -117,25 +114,28 @@
             currentDisplayValue = progress;
 
             if (change > 0) {
-                progressBar.style.backgroundColor = '#ff69b4'; // Hot pink
+                progressBar.style.backgroundColor = 'hotpink';
                 progressContainer.classList.add('pulse');
                 title.classList.add('pulse');
                 message.classList.add('pulse');
                 message.textContent = 'Great job! Keep going!';
-                dingSound.play(); // Play ding sound
+                dingSound.play();
             } else if (change < 0) {
                 progressBar.style.backgroundColor = 'red';
                 progressContainer.classList.add('shake');
                 title.classList.add('shake');
                 message.classList.add('shake');
                 message.textContent = 'Careful, focus!';
-                buzzSound.play(); // Play buzz sound
+                buzzSound.play();
             } else {
-                progressBar.style.backgroundColor = '#ff69b4'; // Hot pink
+                progressBar.style.backgroundColor = 'hotpink';
                 message.textContent = '';
             }
 
             setTimeout(() => {
+                progressContainer.classList.remove('pulse');
+                title.classList.remove('pulse');
+                message.classList.remove('pulse');
                 progressContainer.classList.remove('shake');
                 title.classList.remove('shake');
                 message.classList.remove('shake');
