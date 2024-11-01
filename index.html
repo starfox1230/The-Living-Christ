@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Progress Bar</title>
     <style>
         /* General Styles */
@@ -195,6 +196,7 @@
         let countdownNumber = 3;
         let countdownInterval = null;
         let audioContext = null;
+        let isBuzzPlaying = false; // Flag to track buzz sound state
 
         // Get DOM elements
         const progressBar = document.getElementById('progress-bar');
@@ -217,29 +219,35 @@
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
             }
-
+            
             // Prime the audio elements
             dingSound.load();
             buzzSound.load();
         }
 
-        // Function to play sound with proper handling
+        // Function to play sound with proper error handling
         async function playSound(sound) {
             try {
                 if (!audioContext) {
                     initAudio();
                 }
 
-                // Create a new Audio object with the same source
-                const newSound = new Audio(sound.src);
-                newSound.preload = 'auto';
+                // Stop sound if it's currently playing
+                if (!sound.paused) {
+                    sound.pause();
+                    sound.currentTime = 0;
+                }
 
-                // Connect the audio element to the audio context
-                const track = audioContext.createMediaElementSource(newSound);
-                track.connect(audioContext.destination);
+                // If the sound is buzz, ensure only one play at a time
+                if (sound === buzzSound) {
+                    if (isBuzzPlaying) return; // Exit if buzz is still playing
+                    isBuzzPlaying = true;
+                    sound.addEventListener('ended', () => {
+                        isBuzzPlaying = false;
+                    }, { once: true });
+                }
 
-                const playPromise = newSound.play();
-
+                const playPromise = sound.play();
                 if (playPromise !== undefined) {
                     await playPromise;
                 }
@@ -247,11 +255,6 @@
                 console.error('Error playing sound:', error);
             }
         }
-
-        // Initialize audio on first user interaction
-        document.addEventListener('touchstart', initAudio, { once: true });
-        document.addEventListener('keydown', initAudio, { once: true });
-        document.addEventListener('mousedown', initAudio, { once: true });
 
         function toggleNightMode() {
             nightMode = !nightMode;
@@ -343,6 +346,11 @@
             message.textContent = 'Keep going!';
             gameOverOverlay.style.display = 'none';
             document.body.classList.remove('red-mode');
+
+            // Reset audio flags and stop all sounds
+            isBuzzPlaying = false;
+            dingSound.pause(); dingSound.currentTime = 0;
+            buzzSound.pause(); buzzSound.currentTime = 0;
         }
 
         function startCountdown() {
