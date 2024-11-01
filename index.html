@@ -137,7 +137,7 @@
             }, 50);
         }
 
-        function updateProgress(change) {
+        function updateProgress(change, silent = false) {
             if (hearts === 0) return; // Prevent changes if game over
 
             const oldProgress = progress;
@@ -150,24 +150,26 @@
             animateProgress(currentDisplayValue, progress);
             currentDisplayValue = progress;
 
-            if (change > 0) {
-                progressBar.style.backgroundColor = 'hotpink';
-                progressContainer.classList.add('pulse');
-                title.classList.add('pulse');
-                message.classList.add('pulse');
-                message.textContent = 'Great job! Keep going!';
-                dingSound.play();
-            } else if (change < 0) {
-                progressBar.style.backgroundColor = 'red';
-                progressContainer.classList.add('shake');
-                title.classList.add('shake');
-                message.classList.add('shake');
-                message.textContent = 'Careful, focus!';
-                buzzSound.play();
-                loseHeart();
-            } else {
-                progressBar.style.backgroundColor = 'hotpink';
-                message.textContent = '';
+            if (!silent) { // only apply animations, colors, sounds if not 'silent'
+                if (change > 0) {
+                    progressBar.style.backgroundColor = 'hotpink';
+                    progressContainer.classList.add('pulse');
+                    title.classList.add('pulse');
+                    message.classList.add('pulse');
+                    message.textContent = 'Great job! Keep going!';
+                    dingSound.play();
+                } else if (change < 0) {
+                    progressBar.style.backgroundColor = 'red';
+                    progressContainer.classList.add('shake');
+                    title.classList.add('shake');
+                    message.classList.add('shake');
+                    message.textContent = 'Careful, focus!';
+                    buzzSound.play();
+                    loseHeart();
+                } else {
+                    progressBar.style.backgroundColor = 'hotpink';
+                    message.textContent = '';
+                }
             }
 
             setTimeout(() => {
@@ -213,6 +215,12 @@
             }
             if (hearts > 0 && progress > 0 && event.key === 'ArrowLeft') {
                 updateProgress(-5);
+            }
+            if (event.key === '+') { // increase silently
+                updateProgress(5, true);
+            }
+            if (event.key === '-') { // decrease silently
+                updateProgress(-5, true);
             }
             if (hearts === 0 && event.key === ' ') {
                 restartGame();
