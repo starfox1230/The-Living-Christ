@@ -60,19 +60,12 @@
             align-items: center;
             justify-content: flex-end; /* Right-justify the hearts */
             margin-top: 10px;
-            font-size: 2em; /* Increased font size */
+            font-size: 2em; /* increased the font size */
             width: 80%; /* Adjust width to fit the layout */
         }
         .heart {
             color: hotpink;
             margin-left: 5px; /* Adjust margin for spacing */
-            transition: color 0.5s;
-        }
-        .greyed-out {
-            color: #ddd; /* Default grey color */
-        }
-        .night-mode .greyed-out {
-            color: #333; /* Darker grey for night mode */
         }
         #game-over-overlay {
             position: absolute;
@@ -129,16 +122,53 @@
         .night-mode #restart-button {
             background-color: #FF4C4C;
         }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-5px, -5px) rotate(-5deg); }
+            75% { transform: translate(5px, 5px) rotate(5deg); }
+        }
+        .pulse { animation: pulse 0.5s ease-in-out; }
+        .shake { animation: shake 0.5s ease-in-out; }
+
+        @keyframes hazyPulse {
+            0% { background-color: rgba(255, 0, 0, 0.1); }
+            50% { background-color: rgba(255, 0, 0, 0.3); }
+            100% { background-color: rgba(255, 0, 0, 0.1); }
+        }
+        #red-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 1;
+            pointer-events: none;
+            animation: hazyPulse 1s infinite;
+        }
+        #countdown-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10em;
+            color: red;
+            display: none;
+            z-index: 2;
+        }
     </style>
 </head>
 <body>
     <div id="heart-container">
-        <!-- Displaying five hearts initially -->
-        <span class="heart" id="heart1">&#9829;</span>
-        <span class="heart" id="heart2">&#9829;</span>
-        <span class="heart" id="heart3">&#9829;</span>
-        <span class="heart" id="heart4">&#9829;</span>
-        <span class="heart" id="heart5">&#9829;</span>
+        <span id="heart-count">5</span>
+        <span class="heart">&#9829;</span>
     </div>
 
     <div id="progress-container">
@@ -178,13 +208,7 @@
         const progressContainer = document.getElementById('progress-container');
         const dingSound = document.getElementById('ding-sound');
         const buzzSound = document.getElementById('buzz-sound');
-        const heartsArray = [
-            document.getElementById('heart1'),
-            document.getElementById('heart2'),
-            document.getElementById('heart3'),
-            document.getElementById('heart4'),
-            document.getElementById('heart5')
-        ];
+        const heartCount = document.getElementById('heart-count');
         const gameOverOverlay = document.getElementById('game-over-overlay');
         const restartButton = document.getElementById('restart-button');
         const countdownOverlay = document.getElementById('countdown-overlay');
@@ -302,13 +326,12 @@
         }
 
         function loseHeart() {
-            if (hearts > 0) {
-                hearts--;
-                // Grey out the rightmost active heart
-                heartsArray[hearts].classList.add('greyed-out');
-            }
+            hearts--;
+            heartCount.textContent = hearts;
             if (hearts === 0) {
                 gameOver();
+            } else {
+                message.textContent = `Hearts left: ${hearts}`; // Update message with remaining hearts
             }
         }
 
@@ -324,12 +347,12 @@
             hearts = 5;
             progressBar.style.width = '0%';
             progressText.textContent = '0%';
+            heartCount.textContent = hearts;
             message.textContent = 'Keep going!';
             gameOverOverlay.style.display = 'none';
             document.body.classList.remove('red-mode');
 
-            // Reset all hearts to hotpink and reset audio flags
-            heartsArray.forEach(heart => heart.classList.remove('greyed-out'));
+            // Reset audio flags and stop all sounds
             isBuzzPlaying = false;
             dingSound.pause(); dingSound.currentTime = 0;
             buzzSound.pause(); buzzSound.currentTime = 0;
