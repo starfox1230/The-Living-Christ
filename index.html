@@ -18,6 +18,7 @@
             background-color: #f0f0f0;
             overflow: hidden;
             transition: background-color 0.5s;
+            color: black; /* Default text color */
         }
         #progress-container {
             position: relative;
@@ -27,6 +28,7 @@
             border-radius: 15px;
             overflow: hidden;
             margin: 20px 0;
+            transition: background-color 0.5s;
         }
         #progress-bar {
             height: 100%;
@@ -43,7 +45,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color: black;
+            color: black; /* Default text color */
             font-weight: bold;
         }
         #message {
@@ -57,8 +59,9 @@
         }
         .heart {
             font-size: 1.5em;
-            color: red;
+            color: hotpink; /* Controllable color */
             margin-right: 5px;
+            font-family: Arial, sans-serif;
         }
         #game-over-overlay {
             position: absolute;
@@ -72,9 +75,9 @@
             text-align: center;
             display: none;
             z-index: 1;
+            color: red; /* Default game-over text color */
         }
         #game-over-overlay h2 {
-            color: red;
             font-size: 2em;
             margin: 0;
             font-weight: bold;
@@ -90,10 +93,21 @@
             cursor: pointer;
         }
         .night-mode {
-            background-color: #333;
+            background-color: #1e1e1e; /* Dark background for night mode */
+            color: #e0e0e0; /* Light text for night mode */
+        }
+        .night-mode #progress-container {
+            background-color: #333; /* Darker gray for night mode */
         }
         .night-mode #progress-bar {
-            background-color: blue;
+            background-color: #4A90E2; /* Lighter blue for night mode */
+        }
+        .night-mode #game-over-overlay {
+            background: #333;
+            color: #FF4C4C;
+        }
+        .night-mode #restart-button {
+            background-color: #FF4C4C;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -112,15 +126,16 @@
 <body>
 
     <div id="heart-container">
-        <span class="heart">❤️</span>
+        <span class="heart">&#9829;</span> <!-- Unicode heart symbol -->
         <span id="heart-count">5</span>
     </div>
-    <div id="message">Keep going!</div>
 
     <div id="progress-container">
         <div id="progress-bar"></div>
         <div id="progress-text">0%</div>
     </div>
+
+    <div id="message">Keep going!</div>
 
     <div id="game-over-overlay">
         <h2>Game Over</h2>
@@ -148,7 +163,7 @@
         function toggleNightMode() {
             nightMode = !nightMode;
             document.body.classList.toggle('night-mode', nightMode);
-            progressBar.style.backgroundColor = nightMode ? 'blue' : 'hotpink';
+            progressBar.style.backgroundColor = nightMode ? '#4A90E2' : 'hotpink';
         }
 
         function animateProgress(oldValue, newValue) {
