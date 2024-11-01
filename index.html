@@ -132,17 +132,10 @@
         .pulse { animation: pulse 0.5s ease-in-out; }
         .shake { animation: shake 0.5s ease-in-out; }
 
-        /* Styles for the countdown and red overlay */
         @keyframes hazyPulse {
-            0% {
-                background-color: rgba(255, 0, 0, 0.1);
-            }
-            50% {
-                background-color: rgba(255, 0, 0, 0.3);
-            }
-            100% {
-                background-color: rgba(255, 0, 0, 0.1);
-            }
+            0% { background-color: rgba(255, 0, 0, 0.1); }
+            50% { background-color: rgba(255, 0, 0, 0.3); }
+            100% { background-color: rgba(255, 0, 0, 0.1); }
         }
         #red-overlay {
             position: fixed;
@@ -170,7 +163,6 @@
     </style>
 </head>
 <body>
-
     <div id="heart-container">
         <span class="heart">&#9829;</span>
         <span id="heart-count">5</span>
@@ -188,12 +180,12 @@
         <button id="restart-button" onclick="restartGame()">Try Again</button>
     </div>
 
-    <!-- Overlays for countdown and red effect -->
     <div id="red-overlay"></div>
     <div id="countdown-overlay"></div>
 
-    <audio id="ding-sound" src="Ding.m4a"></audio>
-    <audio id="buzz-sound" src="Buzz.m4a"></audio>
+    <!-- Audio elements with preload attribute -->
+    <audio id="ding-sound" src="Ding.m4a" preload="auto"></audio>
+    <audio id="buzz-sound" src="Buzz.m4a" preload="auto"></audio>
 
     <script>
         let progress = 0;
@@ -203,7 +195,9 @@
         let countdownTimer = null;
         let countdownNumber = 3;
         let countdownInterval = null;
+        let audioContext = null;
 
+        // Get DOM elements
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
@@ -215,6 +209,46 @@
         const restartButton = document.getElementById('restart-button');
         const countdownOverlay = document.getElementById('countdown-overlay');
         const redOverlay = document.getElementById('red-overlay');
+
+        // Initialize audio context
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
+            // Prime the audio elements
+            dingSound.load();
+            buzzSound.load();
+        }
+
+        // Function to play sound with proper error handling
+        async function playSound(sound) {
+            try {
+                if (!audioContext) {
+                    initAudio();
+                }
+                
+                // Always reset the sound to the beginning
+                sound.currentTime = 0;
+                
+                // Create a new promise for playing the sound
+                const playPromise = sound.play();
+                
+                if (playPromise !== undefined) {
+                    await playPromise;
+                }
+            } catch (error) {
+                console.error('Error playing sound:', error);
+            }
+        }
+
+        // Initialize audio on first user interaction
+        document.addEventListener('touchstart', initAudio, { once: true });
+        document.addEventListener('keydown', initAudio, { once: true });
+        document.addEventListener('mousedown', initAudio, { once: true });
 
         function toggleNightMode() {
             nightMode = !nightMode;
@@ -260,15 +294,14 @@
                     progressContainer.classList.add('pulse');
                     message.classList.add('pulse');
                     message.textContent = 'Great job! Keep going!';
-                    dingSound.play();
+                    playSound(dingSound);
                 } else if (change < 0) {
                     document.body.classList.add('red-mode');
                     progressBar.style.backgroundColor = '';
                     progressContainer.classList.add('shake');
                     message.classList.add('shake');
                     message.textContent = 'Careful, focus!';
-                    buzzSound.currentTime = 0; // Reset sound to start
-                    buzzSound.play().catch(e => console.log('Buzz sound play error:', e));
+                    playSound(buzzSound);
                     loseHeart();
                 } else {
                     message.textContent = '';
@@ -363,6 +396,10 @@
                 restartGame();
             }
         });
+
+        // Initialize audio elements
+        dingSound.load();
+        buzzSound.load();
     </script>
 </body>
 </html>
