@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Progress Bar</title>
     <style>
         /* General Styles */
@@ -191,7 +192,8 @@
     <div id="red-overlay"></div>
     <div id="countdown-overlay"></div>
 
-    <!-- Audio elements removed -->
+    <audio id="ding-sound" src="Ding.m4a"></audio>
+    <audio id="buzz-sound" src="Buzz.m4a"></audio>
 
     <script>
         let progress = 0;
@@ -206,50 +208,13 @@
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
         const progressContainer = document.getElementById('progress-container');
+        const dingSound = document.getElementById('ding-sound');
+        const buzzSound = document.getElementById('buzz-sound');
         const heartCount = document.getElementById('heart-count');
         const gameOverOverlay = document.getElementById('game-over-overlay');
         const restartButton = document.getElementById('restart-button');
         const countdownOverlay = document.getElementById('countdown-overlay');
         const redOverlay = document.getElementById('red-overlay');
-
-        // Initialize AudioContext and audio buffers
-        let audioContext;
-        let dingBuffer;
-        let buzzBuffer;
-
-        // Load audio files using fetch and decode them
-        async function loadAudioFiles() {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Function to load and decode an audio file
-            async function loadAudio(url) {
-                const response = await fetch(url);
-                const arrayBuffer = await response.arrayBuffer();
-                return await audioContext.decodeAudioData(arrayBuffer);
-            }
-
-            // Load the ding and buzz sounds
-            dingBuffer = await loadAudio('Ding.m4a');
-            buzzBuffer = await loadAudio('Buzz.m4a');
-        }
-
-        // Play a sound buffer
-        function playSound(buffer) {
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect(audioContext.destination);
-            source.start(0);
-        }
-
-        // Ensure audio context is resumed on user interaction
-        function resumeAudioContext() {
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-        }
-
-        // Load audio files on page load
-        loadAudioFiles();
 
         function toggleNightMode() {
             nightMode = !nightMode;
@@ -295,16 +260,15 @@
                     progressContainer.classList.add('pulse');
                     message.classList.add('pulse');
                     message.textContent = 'Great job! Keep going!';
-                    resumeAudioContext();
-                    playSound(dingBuffer);
+                    dingSound.play();
                 } else if (change < 0) {
                     document.body.classList.add('red-mode');
                     progressBar.style.backgroundColor = '';
                     progressContainer.classList.add('shake');
                     message.classList.add('shake');
                     message.textContent = 'Careful, focus!';
-                    resumeAudioContext();
-                    playSound(buzzBuffer);
+                    buzzSound.currentTime = 0; // Reset sound to start
+                    buzzSound.play().catch(e => console.log('Buzz sound play error:', e));
                     loseHeart();
                 } else {
                     message.textContent = '';
@@ -376,7 +340,6 @@
         document.addEventListener('keydown', (event) => {
             if (hearts > 0 && progress < 100 && event.key === ' ') {
                 event.preventDefault();
-                resumeAudioContext();
                 updateProgress(5);
             }
             if (hearts > 0 && progress > 0 && event.key === 'ArrowLeft') {
@@ -400,9 +363,6 @@
                 restartGame();
             }
         });
-
-        // Resume AudioContext on first user interaction
-        document.addEventListener('click', resumeAudioContext, { once: true });
     </script>
 </body>
 </html>
