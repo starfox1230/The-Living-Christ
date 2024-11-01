@@ -18,7 +18,8 @@
             background-color: #f0f0f0;
             overflow: hidden;
             transition: background-color 0.5s;
-            color: black; /* Default text color */
+            color: black;
+            position: relative;
         }
         #progress-container {
             position: relative;
@@ -45,7 +46,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color: black; /* Default text color */
+            color: black;
             font-weight: bold;
             transition: color 0.5s;
         }
@@ -60,7 +61,7 @@
         }
         .heart {
             font-size: 1.5em;
-            color: hotpink; /* Controllable color */
+            color: hotpink;
             margin-right: 5px;
             font-family: Arial, sans-serif;
         }
@@ -76,7 +77,7 @@
             text-align: center;
             display: none;
             z-index: 1;
-            color: red; /* Default game-over text color */
+            color: red;
         }
         #game-over-overlay h2 {
             font-size: 2em;
@@ -94,49 +95,33 @@
             cursor: pointer;
         }
         .night-mode {
-            background-color: #1e1e1e; /* Dark background for night mode */
-            color: #e0e0e0; /* Light text for night mode */
+            background-color: #1e1e1e;
+            color: #e0e0e0;
         }
-        .night-mode #progress-container {
-            background-color: #333; /* Darker gray for night mode */
+        .red-mode {
+            outline: 5px solid red;
+            animation: pulseOutline 1s infinite alternate;
         }
-        .night-mode #progress-bar {
-            background-color: #4A90E2; /* Lighter blue for night mode */
+        @keyframes pulseOutline {
+            0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+            100% { box-shadow: 0 0 30px rgba(255, 0, 0, 1); }
         }
-        .night-mode #progress-text {
-            color: white; /* Light text for contrast against blue */
+        #countdown-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5em;
+            color: red;
+            z-index: 1;
+            display: none;
         }
-        .night-mode.red-mode #progress-bar {
-            background-color: #ff5555; /* Softer red for night mode */
-        }
-        .red-mode #progress-bar {
-            background-color: red; /* Default red for day mode */
-        }
-        .night-mode #game-over-overlay {
-            background: #333;
-            color: #FF4C4C;
-        }
-        .night-mode #restart-button {
-            background-color: #FF4C4C;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translate(0); }
-            25% { transform: translate(-5px, -5px) rotate(-5deg); }
-            75% { transform: translate(5px, 5px) rotate(5deg); }
-        }
-        .pulse { animation: pulse 0.5s ease-in-out; }
-        .shake { animation: shake 0.5s ease-in-out; }
     </style>
 </head>
 <body>
 
     <div id="heart-container">
-        <span class="heart">&#9829;</span> <!-- Unicode heart symbol -->
+        <span class="heart">&#9829;</span>
         <span id="heart-count">5</span>
     </div>
 
@@ -152,6 +137,8 @@
         <button id="restart-button" onclick="restartGame()">Try Again</button>
     </div>
 
+    <div id="countdown-overlay">3</div>
+
     <audio id="ding-sound" src="Ding.m4a"></audio>
     <audio id="buzz-sound" src="Buzz.m4a"></audio>
 
@@ -160,6 +147,8 @@
         let currentDisplayValue = 0;
         let hearts = 5;
         let nightMode = false;
+        let countdownActive = false;
+        let countdownTimer;
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
@@ -168,7 +157,7 @@
         const buzzSound = document.getElementById('buzz-sound');
         const heartCount = document.getElementById('heart-count');
         const gameOverOverlay = document.getElementById('game-over-overlay');
-        const restartButton = document.getElementById('restart-button');
+        const countdownOverlay = document.getElementById('countdown-overlay');
 
         function toggleNightMode() {
             nightMode = !nightMode;
@@ -182,15 +171,56 @@
             let current = oldValue;
             const interval = setInterval(() => {
                 current += step;
-                progressText.textContent = Math.max(0, current) + '%'; // Prevents display from going below 0
+                progressText.textContent = Math.max(0, current) + '%';
                 if (current === newValue || current < 0) {
                     clearInterval(interval);
                 }
             }, 50);
         }
 
+        function startCountdown() {
+            countdownActive = true;
+            let countdownValue = 3;
+            countdownOverlay.textContent = countdownValue;
+            countdownOverlay.style.display = 'block';
+            document.body.classList.add('red-mode');
+
+            countdownTimer = setInterval(() => {
+                countdownValue--;
+                countdownOverlay.textContent = countdownValue;
+                if (countdownValue <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownOverlay.style.display = 'none';
+                    document.body.classList.remove('red-mode');
+                    countdownActive = false;
+                    initiateNegativeFeedback();
+                }
+            }, 1000);
+        }
+
+        function cancelCountdown() {
+            clearInterval(countdownTimer);
+            countdownOverlay.style.display = 'none';
+            document.body.classList.remove('red-mode');
+            countdownActive = false;
+        }
+
+        function initiateNegativeFeedback() {
+            progressBar.style.backgroundColor = ''; 
+            progressContainer.classList.add('shake');
+            message.classList.add('shake');
+            message.textContent = 'Careful, focus!';
+            buzzSound.play();
+            loseHeart();
+
+            setTimeout(() => {
+                progressContainer.classList.remove('shake');
+                message.classList.remove('shake');
+            }, 500);
+        }
+
         function updateProgress(change, silent = false) {
-            if (hearts === 0) return; // Prevent changes if game over
+            if (hearts === 0) return;
 
             const oldProgress = progress;
             progress += change;
@@ -207,8 +237,9 @@
                 return;
             }
 
-            if (!silent) { // only apply animations, colors, sounds if not 'silent'
+            if (!silent) {
                 if (change > 0) {
+                    cancelCountdown();
                     document.body.classList.remove('red-mode');
                     progressBar.style.backgroundColor = nightMode ? '#4A90E2' : 'hotpink';
                     progressContainer.classList.add('pulse');
@@ -216,24 +247,13 @@
                     message.textContent = 'Great job! Keep going!';
                     dingSound.play();
                 } else if (change < 0) {
-                    document.body.classList.add('red-mode');
-                    progressBar.style.backgroundColor = ''; // Remove inline style to enable red mode color
-                    progressContainer.classList.add('shake');
-                    message.classList.add('shake');
-                    message.textContent = 'Careful, focus!';
-                    buzzSound.play();
-                    loseHeart();
-                } else {
-                    message.textContent = '';
+                    if (!countdownActive) {
+                        startCountdown();
+                    } else {
+                        cancelCountdown();
+                    }
                 }
             }
-
-            setTimeout(() => {
-                progressContainer.classList.remove('pulse');
-                message.classList.remove('pulse');
-                progressContainer.classList.remove('shake');
-                message.classList.remove('shake');
-            }, 500);
         }
 
         function loseHeart() {
@@ -246,7 +266,7 @@
 
         function gameOver() {
             gameOverOverlay.style.display = 'block';
-            message.textContent = ''; // Clear message when game over
+            message.textContent = '';
         }
 
         function restartGame() {
@@ -259,6 +279,7 @@
             message.textContent = 'Keep going!';
             gameOverOverlay.style.display = 'none';
             document.body.classList.remove('red-mode');
+            cancelCountdown();
         }
 
         document.addEventListener('keydown', (event) => {
@@ -269,10 +290,10 @@
             if (hearts > 0 && progress > 0 && event.key === 'ArrowLeft') {
                 updateProgress(-5);
             }
-            if (event.key === '+') { // increase silently
+            if (event.key === '+') {
                 updateProgress(5, true);
             }
-            if (event.key === '-') { // decrease silently
+            if (event.key === '-') {
                 updateProgress(-5, true);
             }
             if (event.key === 'F12') {
