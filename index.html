@@ -217,6 +217,7 @@
                     dingSound.play();
                 } else if (change < 0) {
                     document.body.classList.add('red-mode');
+                    progressBar.style.backgroundColor = ''; // Remove inline style to enable red mode color
                     progressContainer.classList.add('shake');
                     message.classList.add('shake');
                     message.textContent = 'Careful, focus!';
