@@ -16,7 +16,7 @@
             align-items: center;
             height: 100vh;
             background-color: #f0f0f0;
-            overflow: hidden; /* Prevent scrolling */
+            overflow: hidden;
         }
         #progress-container {
             position: relative;
@@ -49,6 +49,33 @@
             font-size: 1.2em;
             margin-top: 20px;
         }
+        #heart-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .heart {
+            font-size: 1.5em;
+            color: red;
+            margin-right: 5px;
+        }
+        #game-over {
+            display: none;
+            font-size: 1.5em;
+            color: red;
+            margin-top: 20px;
+        }
+        #restart-button {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: hotpink;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -59,12 +86,8 @@
             25% { transform: translate(-5px, -5px) rotate(-5deg); }
             75% { transform: translate(5px, 5px) rotate(5deg); }
         }
-        .pulse {
-            animation: pulse 0.5s ease-in-out;
-        }
-        .shake {
-            animation: shake 0.5s ease-in-out;
-        }
+        .pulse { animation: pulse 0.5s ease-in-out; }
+        .shake { animation: shake 0.5s ease-in-out; }
     </style>
 </head>
 <body>
@@ -76,12 +99,21 @@
     </div>
     <div id="message">Keep going!</div>
 
+    <div id="heart-container">
+        <span class="heart">❤️</span>
+        <span id="heart-count">5</span>
+    </div>
+
+    <div id="game-over">Game Over</div>
+    <button id="restart-button" onclick="restartGame()">Try Again</button>
+
     <audio id="ding-sound" src="Ding.m4a"></audio>
     <audio id="buzz-sound" src="Buzz.m4a"></audio>
 
     <script>
         let progress = 0;
         let currentDisplayValue = 0;
+        let hearts = 5;
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
@@ -89,6 +121,9 @@
         const title = document.getElementById('title');
         const dingSound = document.getElementById('ding-sound');
         const buzzSound = document.getElementById('buzz-sound');
+        const heartCount = document.getElementById('heart-count');
+        const gameOverText = document.getElementById('game-over');
+        const restartButton = document.getElementById('restart-button');
 
         function animateProgress(oldValue, newValue) {
             const step = oldValue < newValue ? 1 : -1;
@@ -99,10 +134,12 @@
                 if (current === newValue) {
                     clearInterval(interval);
                 }
-            }, 50); // Slower animation speed
+            }, 50);
         }
 
         function updateProgress(change) {
+            if (hearts === 0) return; // Prevent changes if game over
+
             const oldProgress = progress;
             progress += change;
 
@@ -127,6 +164,7 @@
                 message.classList.add('shake');
                 message.textContent = 'Careful, focus!';
                 buzzSound.play();
+                loseHeart();
             } else {
                 progressBar.style.backgroundColor = 'hotpink';
                 message.textContent = '';
@@ -142,13 +180,42 @@
             }, 500);
         }
 
+        function loseHeart() {
+            hearts--;
+            heartCount.textContent = hearts;
+            if (hearts === 0) {
+                gameOver();
+            }
+        }
+
+        function gameOver() {
+            gameOverText.style.display = 'block';
+            restartButton.style.display = 'block';
+            message.textContent = 'Game Over';
+        }
+
+        function restartGame() {
+            progress = 0;
+            currentDisplayValue = 0;
+            hearts = 5;
+            progressBar.style.width = '0%';
+            progressText.textContent = '0%';
+            heartCount.textContent = hearts;
+            message.textContent = 'Keep going!';
+            gameOverText.style.display = 'none';
+            restartButton.style.display = 'none';
+        }
+
         document.addEventListener('keydown', (event) => {
-            if (progress < 100 && event.key === ' ') {
-                event.preventDefault(); // Prevent default spacebar behavior
+            if (hearts > 0 && progress < 100 && event.key === ' ') {
+                event.preventDefault();
                 updateProgress(5);
             }
-            if (progress > 0 && event.key === 'ArrowLeft') {
+            if (hearts > 0 && progress > 0 && event.key === 'ArrowLeft') {
                 updateProgress(-5);
+            }
+            if (hearts === 0 && event.key === ' ') {
+                restartGame();
             }
         });
     </script>
