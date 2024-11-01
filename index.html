@@ -224,19 +224,17 @@
             buzzSound.load();
         }
 
-        // Function to play sound with proper error handling
+        // Function to play sound with proper handling
         async function playSound(sound) {
             try {
                 if (!audioContext) {
                     initAudio();
                 }
-                
-                // Always reset the sound to the beginning
-                sound.currentTime = 0;
-                
-                // Create a new promise for playing the sound
-                const playPromise = sound.play();
-                
+
+                // Clone the audio element to ensure consistent playback
+                const newSound = sound.cloneNode(true);
+                const playPromise = newSound.play();
+
                 if (playPromise !== undefined) {
                     await playPromise;
                 }
