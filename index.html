@@ -62,21 +62,24 @@
         }
         #game-over-overlay {
             position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background: white;
+            border: 2px solid red;
+            border-radius: 10px;
+            text-align: center;
             display: none;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            font-size: 2em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             z-index: 1;
         }
+        #game-over-overlay h2 {
+            color: red;
+            font-size: 2em;
+            margin: 0;
+            font-weight: bold;
+        }
         #restart-button {
-            display: none;
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 1em;
@@ -119,8 +122,10 @@
         <div id="progress-text">0%</div>
     </div>
 
-    <div id="game-over-overlay">Game Over</div>
-    <button id="restart-button" onclick="restartGame()">Try Again</button>
+    <div id="game-over-overlay">
+        <h2>Game Over</h2>
+        <button id="restart-button" onclick="restartGame()">Try Again</button>
+    </div>
 
     <audio id="ding-sound" src="Ding.m4a"></audio>
     <audio id="buzz-sound" src="Buzz.m4a"></audio>
@@ -210,8 +215,7 @@
         }
 
         function gameOver() {
-            gameOverOverlay.style.display = 'flex';
-            restartButton.style.display = 'block';
+            gameOverOverlay.style.display = 'block';
             message.textContent = ''; // Clear message when game over
         }
 
@@ -224,7 +228,6 @@
             heartCount.textContent = hearts;
             message.textContent = 'Keep going!';
             gameOverOverlay.style.display = 'none';
-            restartButton.style.display = 'none';
         }
 
         document.addEventListener('keydown', (event) => {
