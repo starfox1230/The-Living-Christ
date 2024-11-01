@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Progress Bar</title>
     <style>
-        /* Existing styles */
+        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -63,7 +63,6 @@
             font-size: 1.5em;
             color: hotpink;
             margin-right: 5px;
-            font-family: Arial, sans-serif;
         }
         #game-over-overlay {
             position: absolute;
@@ -133,7 +132,7 @@
         .pulse { animation: pulse 0.5s ease-in-out; }
         .shake { animation: shake 0.5s ease-in-out; }
 
-        /* New styles for the countdown and red overlay */
+        /* Styles for the countdown and red overlay */
         @keyframes hazyPulse {
             0% {
                 background-color: rgba(255, 0, 0, 0.1);
@@ -149,12 +148,13 @@
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
             width: 100%;
             height: 100%;
             display: none;
             z-index: 1;
-        }
-        .red-overlay-pulse {
+            pointer-events: none;
             animation: hazyPulse 1s infinite;
         }
         #countdown-overlay {
@@ -188,7 +188,7 @@
         <button id="restart-button" onclick="restartGame()">Try Again</button>
     </div>
 
-    <!-- New overlays for countdown and red effect -->
+    <!-- Overlays for countdown and red effect -->
     <div id="red-overlay"></div>
     <div id="countdown-overlay"></div>
 
@@ -267,7 +267,8 @@
                     progressContainer.classList.add('shake');
                     message.classList.add('shake');
                     message.textContent = 'Careful, focus!';
-                    buzzSound.play();
+                    buzzSound.currentTime = 0; // Reset sound to start
+                    buzzSound.play().catch(e => console.log('Buzz sound play error:', e));
                     loseHeart();
                 } else {
                     message.textContent = '';
@@ -313,7 +314,6 @@
             countdownOverlay.textContent = countdownNumber;
             countdownOverlay.style.display = 'block';
             redOverlay.style.display = 'block';
-            redOverlay.classList.add('red-overlay-pulse');
             countdownTimer = true;
 
             countdownInterval = setInterval(() => {
@@ -324,9 +324,8 @@
                     clearInterval(countdownInterval);
                     countdownOverlay.style.display = 'none';
                     redOverlay.style.display = 'none';
-                    redOverlay.classList.remove('red-overlay-pulse');
                     countdownTimer = null;
-                    updateProgress(-5);
+                    updateProgress(-5); // Trigger buzz
                 }
             }, 1000);
         }
@@ -335,7 +334,6 @@
             clearInterval(countdownInterval);
             countdownOverlay.style.display = 'none';
             redOverlay.style.display = 'none';
-            redOverlay.classList.remove('red-overlay-pulse');
             countdownTimer = null;
         }
 
