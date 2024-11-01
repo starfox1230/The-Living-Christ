@@ -17,6 +17,7 @@
             height: 100vh;
             background-color: #f0f0f0;
             overflow: hidden;
+            transition: background-color 0.5s;
         }
         #progress-container {
             position: relative;
@@ -47,7 +48,7 @@
         }
         #message {
             font-size: 1.2em;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         #heart-container {
             display: flex;
@@ -59,11 +60,20 @@
             color: red;
             margin-right: 5px;
         }
-        #game-over {
+        #game-over-overlay {
+            position: absolute;
             display: none;
-            font-size: 1.5em;
-            color: red;
-            margin-top: 20px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 2em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
         }
         #restart-button {
             display: none;
@@ -75,6 +85,12 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+        }
+        .night-mode {
+            background-color: #333;
+        }
+        .night-mode #progress-bar {
+            background-color: blue;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -92,19 +108,18 @@
 </head>
 <body>
 
-    <h1 id="title">Learning Progress</h1>
-    <div id="progress-container">
-        <div id="progress-bar"></div>
-        <div id="progress-text">0%</div>
-    </div>
-    <div id="message">Keep going!</div>
-
     <div id="heart-container">
         <span class="heart">❤️</span>
         <span id="heart-count">5</span>
     </div>
+    <div id="message">Keep going!</div>
 
-    <div id="game-over">Game Over</div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+        <div id="progress-text">0%</div>
+    </div>
+
+    <div id="game-over-overlay">Game Over</div>
     <button id="restart-button" onclick="restartGame()">Try Again</button>
 
     <audio id="ding-sound" src="Ding.m4a"></audio>
@@ -114,16 +129,22 @@
         let progress = 0;
         let currentDisplayValue = 0;
         let hearts = 5;
+        let nightMode = false;
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const message = document.getElementById('message');
         const progressContainer = document.getElementById('progress-container');
-        const title = document.getElementById('title');
         const dingSound = document.getElementById('ding-sound');
         const buzzSound = document.getElementById('buzz-sound');
         const heartCount = document.getElementById('heart-count');
-        const gameOverText = document.getElementById('game-over');
+        const gameOverOverlay = document.getElementById('game-over-overlay');
         const restartButton = document.getElementById('restart-button');
+
+        function toggleNightMode() {
+            nightMode = !nightMode;
+            document.body.classList.toggle('night-mode', nightMode);
+            progressBar.style.backgroundColor = nightMode ? 'blue' : 'hotpink';
+        }
 
         function animateProgress(oldValue, newValue) {
             const step = oldValue < newValue ? 1 : -1;
@@ -150,34 +171,32 @@
             animateProgress(currentDisplayValue, progress);
             currentDisplayValue = progress;
 
+            if (progress === 100) {
+                message.textContent = 'You did it!';
+                return;
+            }
+
             if (!silent) { // only apply animations, colors, sounds if not 'silent'
                 if (change > 0) {
-                    progressBar.style.backgroundColor = 'hotpink';
                     progressContainer.classList.add('pulse');
-                    title.classList.add('pulse');
                     message.classList.add('pulse');
                     message.textContent = 'Great job! Keep going!';
                     dingSound.play();
                 } else if (change < 0) {
-                    progressBar.style.backgroundColor = 'red';
                     progressContainer.classList.add('shake');
-                    title.classList.add('shake');
                     message.classList.add('shake');
                     message.textContent = 'Careful, focus!';
                     buzzSound.play();
                     loseHeart();
                 } else {
-                    progressBar.style.backgroundColor = 'hotpink';
                     message.textContent = '';
                 }
             }
 
             setTimeout(() => {
                 progressContainer.classList.remove('pulse');
-                title.classList.remove('pulse');
                 message.classList.remove('pulse');
                 progressContainer.classList.remove('shake');
-                title.classList.remove('shake');
                 message.classList.remove('shake');
             }, 500);
         }
@@ -191,9 +210,9 @@
         }
 
         function gameOver() {
-            gameOverText.style.display = 'block';
+            gameOverOverlay.style.display = 'flex';
             restartButton.style.display = 'block';
-            message.textContent = 'Game Over';
+            message.textContent = ''; // Clear message when game over
         }
 
         function restartGame() {
@@ -204,7 +223,7 @@
             progressText.textContent = '0%';
             heartCount.textContent = hearts;
             message.textContent = 'Keep going!';
-            gameOverText.style.display = 'none';
+            gameOverOverlay.style.display = 'none';
             restartButton.style.display = 'none';
         }
 
@@ -221,6 +240,9 @@
             }
             if (event.key === '-') { // decrease silently
                 updateProgress(-5, true);
+            }
+            if (event.key === 'F12') {
+                toggleNightMode();
             }
             if (hearts === 0 && event.key === ' ') {
                 restartGame();
