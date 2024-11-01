@@ -106,8 +106,11 @@
         .night-mode #progress-text {
             color: white; /* Light text for contrast against blue */
         }
-        .night-mode .red-mode {
+        .night-mode.red-mode #progress-bar {
             background-color: #ff5555; /* Softer red for night mode */
+        }
+        .red-mode #progress-bar {
+            background-color: red; /* Default red for day mode */
         }
         .night-mode #game-over-overlay {
             background: #333;
@@ -115,9 +118,6 @@
         }
         .night-mode #restart-button {
             background-color: #FF4C4C;
-        }
-        .red-mode {
-            background-color: red; /* Default red for day mode */
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -173,7 +173,7 @@
         function toggleNightMode() {
             nightMode = !nightMode;
             document.body.classList.toggle('night-mode', nightMode);
-            progressBar.classList.remove('red-mode');
+            document.body.classList.remove('red-mode');
             progressBar.style.backgroundColor = nightMode ? '#4A90E2' : 'hotpink';
         }
 
@@ -209,14 +209,14 @@
 
             if (!silent) { // only apply animations, colors, sounds if not 'silent'
                 if (change > 0) {
-                    progressBar.classList.remove('red-mode');
+                    document.body.classList.remove('red-mode');
                     progressBar.style.backgroundColor = nightMode ? '#4A90E2' : 'hotpink';
                     progressContainer.classList.add('pulse');
                     message.classList.add('pulse');
                     message.textContent = 'Great job! Keep going!';
                     dingSound.play();
                 } else if (change < 0) {
-                    progressBar.classList.add('red-mode');
+                    document.body.classList.add('red-mode');
                     progressContainer.classList.add('shake');
                     message.classList.add('shake');
                     message.textContent = 'Careful, focus!';
@@ -257,7 +257,7 @@
             heartCount.textContent = hearts;
             message.textContent = 'Keep going!';
             gameOverOverlay.style.display = 'none';
-            progressBar.classList.remove('red-mode');
+            document.body.classList.remove('red-mode');
         }
 
         document.addEventListener('keydown', (event) => {
