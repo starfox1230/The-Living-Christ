@@ -182,8 +182,8 @@
             let current = oldValue;
             const interval = setInterval(() => {
                 current += step;
-                progressText.textContent = current + '%';
-                if (current === newValue) {
+                progressText.textContent = Math.max(0, current) + '%'; // Prevents display from going below 0
+                if (current === newValue || current < 0) {
                     clearInterval(interval);
                 }
             }, 50);
