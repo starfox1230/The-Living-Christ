@@ -535,7 +535,6 @@
         // Night Mode background
         document.body.style.background = `linear-gradient(270deg, var(--background-dark), #2e2e2e)`;
         document.body.style.backgroundSize = "400% 400%";
-        // Slightly different animation speed if you prefer
         document.body.style.animation = "moveBackground 20s ease infinite";
 
         // For the progress bar, use a night-specific gradient
@@ -546,7 +545,8 @@
         // Update Particles for Night Mode
         initializeParticles(true);
       } else {
-        // Day Mode background: keep the hue-based approach or a static gradient
+        // Day Mode background
+        // If you previously had a dynamic color based on progress, you can keep it:
         const hue = (progress / 100) * 120; // 0 (red) to 120 (green)
         document.body.style.background = `hsl(${hue}, 70%, 90%)`;
         document.body.style.backgroundSize = "cover";
@@ -603,8 +603,7 @@
       animateProgress(currentDisplayValue, progress);
       currentDisplayValue = progress;
 
-      // Immediately update background so day mode can still have dynamic hue
-      // or night mode can keep a steady dark background.
+      // Immediately update background to reflect day color or keep night mode
       setBackground();
 
       if (progress === 100) {
@@ -739,12 +738,23 @@
     =========================== */
 
     document.addEventListener("keydown", (event) => {
+      // Force the code to run for F12 and prevent DevTools from opening immediately
+      if (event.key === "F12") {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleNightMode();
+        return;
+      }
+
+      // Spacebar = Increase progress (if game not over)
       if (hearts > 0 && progress < 100 && event.key === " ") {
         event.preventDefault();
         updateProgress(5);
         progressContainer.classList.add("highlight");
         setTimeout(() => progressContainer.classList.remove("highlight"), 200);
       }
+
+      // ArrowLeft = Start/Cancel countdown
       if (hearts > 0 && progress > 0 && event.key === "ArrowLeft") {
         event.preventDefault();
         if (!countdownTimer) {
@@ -753,15 +763,16 @@
           cancelCountdown();
         }
       }
+
+      // For quick testing or debugging
       if (event.key === "+") {
         updateProgress(5, true);
       }
       if (event.key === "-") {
         updateProgress(-5, true);
       }
-      if (event.key === "F12") {
-        toggleNightMode();
-      }
+
+      // If game over, spacebar = restart
       if (hearts === 0 && event.key === " ") {
         restartGame();
       }
