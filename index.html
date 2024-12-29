@@ -1,663 +1,785 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Progress Bar</title>
-    <!-- Include Particles.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <style>
-        /* Reset and Box-Sizing */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Focus Progress Bar</title>
+  <!-- Include Particles.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    /* Reset and Box-Sizing */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* CSS Variables for Theme Management */
-        :root {
-            --primary-color: hotpink;
-            --secondary-color: #4A90E2;
-            --background-light: #f0f0f0;
-            --background-dark: #1e1e1e;
-            --text-light: black;
-            --text-dark: #e0e0e0;
-            --highlight-color: yellow;
-            --heart-active-glow: 0 0 10px hotpink;
-            --heart-inactive-color: #ddd;
-            --game-over-border: 2px solid red;
-            --game-over-bg: white;
-            --game-over-text: red;
-            --restart-button-bg: hotpink;
-            --restart-button-text: white;
-            --overlay-red: rgba(255, 0, 0, 0.1);
-            --countdown-color: red;
-            --countdown-shadow: 0 0 20px red;
-        }
+    /* CSS Variables for Theme Management */
+    :root {
+      --primary-color: hotpink;
+      --secondary-color: #4A90E2;
+      --background-light: #f0f0f0;
+      --background-dark: #1e1e1e;
+      --text-light: black;
+      --text-dark: #e0e0e0;
+      --highlight-color: yellow;
+      --heart-active-glow: 0 0 10px hotpink;
+      --heart-inactive-color: #ddd;
+      --game-over-border: 2px solid red;
+      --game-over-bg: white;
+      --game-over-text: red;
+      --restart-button-bg: hotpink;
+      --restart-button-text: white;
+      --overlay-red: rgba(255, 0, 0, 0.1);
+      --countdown-color: red;
+      --countdown-shadow: 0 0 20px red;
+    }
 
-        /* General Styles */
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+    /* General Styles */
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(270deg, var(--background-light), #e0e0e0);
-            background-size: 400% 400%;
-            animation: moveBackground 15s ease infinite;
-            transition: background-color 0.5s, color 0.5s;
-            color: var(--text-light);
-            position: relative;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(
+        270deg,
+        var(--background-light),
+        #e0e0e0
+      );
+      background-size: 400% 400%;
+      animation: moveBackground 15s ease infinite;
+      transition: background 0.5s, color 0.5s;
+      color: var(--text-light);
+      position: relative;
+    }
 
-        /* Night Mode Styles */
-        .night-mode {
-            background: linear-gradient(270deg, var(--background-dark), #2e2e2e);
-            background-size: 400% 400%;
-            animation: moveBackground 20s ease infinite;
-            color: var(--text-dark);
-        }
+    /* Night Mode */
+    .night-mode {
+      color: var(--text-dark);
+    }
 
-        /* Progress Container */
-        #progress-container {
-            position: relative;
-            width: 80%;
-            max-width: 600px;
-            height: 30px;
-            background-color: #ddd;
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 20px 0;
-            transition: background-color 0.5s;
-        }
+    /* Progress Container */
+    #progress-container {
+      position: relative;
+      width: 80%;
+      max-width: 600px;
+      height: 30px;
+      background-color: #ddd;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 20px 0;
+      transition: background-color 0.5s;
+    }
 
-        /* Gradient Progress Bar */
-        #progress-bar {
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;
-        }
+    /* Gradient Progress Bar */
+    #progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(
+        90deg,
+        var(--primary-color),
+        var(--secondary-color)
+      );
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        background-color 0.5s;
+    }
 
-        /* Progress Text */
-        #progress-text {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-light);
-            font-weight: bold;
-            transition: color 0.5s;
-            pointer-events: none;
-        }
+    /* Progress Text */
+    #progress-text {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-light);
+      font-weight: bold;
+      transition: color 0.5s;
+      pointer-events: none;
+    }
 
-        /* Message Styling */
-        #message {
-            font-size: 1.2em;
-            margin-top: 10px;
-            opacity: 1;
-            transition: opacity 0.3s;
-        }
+    /* Message Styling */
+    #message {
+      font-size: 1.2em;
+      margin-top: 10px;
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
 
-        /* Heart Container */
-        #heart-container {
-            display: flex;
-            align-items: center;
-            justify-content: center; /* Center-justify the hearts */
-            margin-top: 10px;
-            font-size: 2em; /* Increased font size */
-            width: 80%; /* Adjust width to fit the layout */
-            max-width: 300px;
-        }
+    /* Heart Container */
+    #heart-container {
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Center-justify the hearts */
+      margin-top: 10px;
+      font-size: 2em; /* Increased font size */
+      width: 80%; /* Adjust width to fit the layout */
+      max-width: 300px;
+    }
 
-        /* Heart Styles */
-        .heart {
-            color: var(--primary-color);
-            margin-left: 5px; /* Adjust margin for spacing */
-            transition: color 0.5s, text-shadow 0.5s;
-            text-shadow: var(--heart-active-glow);
-        }
+    /* Heart Styles */
+    .heart {
+      color: var(--primary-color);
+      margin-left: 5px; /* Adjust margin for spacing */
+      transition: color 0.5s, text-shadow 0.5s;
+      text-shadow: var(--heart-active-glow);
+    }
 
-        /* Inactive Heart Styles */
-        .greyed-out {
-            color: var(--heart-inactive-color);
-            text-shadow: none;
-        }
+    /* Inactive Heart Styles */
+    .greyed-out {
+      color: var(--heart-inactive-color);
+      text-shadow: none;
+    }
 
-        /* Night Mode Inactive Hearts */
-        .night-mode .greyed-out {
-            color: #333;
-        }
+    /* Night Mode Inactive Hearts */
+    .night-mode .greyed-out {
+      color: #333;
+    }
 
-        /* Game Over Overlay */
-        #game-over-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            padding: 20px;
-            background: var(--game-over-bg);
-            border: var(--game-over-border);
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-            z-index: 3;
-            color: var(--game-over-text);
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
+    /* Game Over Overlay */
+    #game-over-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      padding: 20px;
+      background: var(--game-over-bg);
+      border: var(--game-over-border);
+      border-radius: 10px;
+      text-align: center;
+      display: none;
+      z-index: 3;
+      color: var(--game-over-text);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
 
-        /* Show Game Over Overlay */
-        #game-over-overlay.show {
-            display: block;
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
+    /* Show Game Over Overlay */
+    #game-over-overlay.show {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
 
-        /* Restart Button */
-        #restart-button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: var(--restart-button-bg);
-            color: var(--restart-button-text);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
+    /* Restart Button */
+    #restart-button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: var(--restart-button-bg);
+      color: var(--restart-button-text);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
 
-        /* Restart Button Active State */
-        #restart-button:active {
-            transform: scale(0.95);
-        }
+    /* Restart Button Active State */
+    #restart-button:active {
+      transform: scale(0.95);
+    }
 
-        /* Night Mode Restart Button */
-        .night-mode #restart-button {
-            background-color: #FF4C4C;
-        }
+    /* Night Mode Restart Button */
+    .night-mode #restart-button {
+      background-color: #FF4C4C;
+    }
 
-        /* Red Mode Styles */
-        .red-mode #progress-bar {
-            background-color: red;
-        }
+    /* Red Mode Styles */
+    .red-mode #progress-bar {
+      background-color: red;
+    }
+    .night-mode.red-mode #progress-bar {
+      background-color: #ff5555;
+    }
 
-        .night-mode.red-mode #progress-bar {
-            background-color: #ff5555;
-        }
+    /* Red Overlay */
+    #red-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+      z-index: 2;
+      pointer-events: none;
+      animation: hazyPulse 1s infinite;
+      background-color: var(--overlay-red);
+    }
 
-        /* Red Overlay */
-        #red-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            z-index: 2;
-            pointer-events: none;
-            animation: hazyPulse 1s infinite;
-            background-color: var(--overlay-red);
-        }
+    /* Countdown Overlay */
+    #countdown-overlay {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10em;
+      color: var(--countdown-color);
+      display: none;
+      z-index: 4;
+      animation: pulseCountdown 1s infinite;
+      text-shadow: var(--countdown-shadow);
+      pointer-events: none;
+    }
 
-        /* Countdown Overlay */
-        #countdown-overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 10em;
-            color: var(--countdown-color);
-            display: none;
-            z-index: 4;
-            animation: pulseCountdown 1s infinite;
-            text-shadow: var(--countdown-shadow);
-            pointer-events: none;
-        }
+    /* Heart Fade-Out Animation */
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+    }
+    .heart.fade-out {
+      animation: fadeOut 0.3s forwards;
+    }
 
-        /* Heart Fade-Out Animation */
-        @keyframes fadeOut {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0, transform: scale(0.5); }
-        }
+    /* Highlight Effect */
+    .highlight {
+      box-shadow: 0 0 10px 2px var(--highlight-color);
+    }
 
-        .heart.fade-out {
-            animation: fadeOut 0.3s forwards;
-        }
+    /* Message Fade Transitions */
+    #message.fade-out {
+      opacity: 0;
+    }
 
-        /* Highlight Effect */
-        .highlight {
-            box-shadow: 0 0 10px 2px var(--highlight-color);
-        }
+    /* Pulse Animation */
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    .pulse {
+      animation: pulse 0.5s ease-in-out;
+    }
 
-        /* Message Fade Transitions */
-        #message.fade-out {
-            opacity: 0;
-        }
+    /* Shake Animation */
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translate(0);
+      }
+      25% {
+        transform: translate(-5px, -5px) rotate(-5deg);
+      }
+      75% {
+        transform: translate(5px, 5px) rotate(5deg);
+      }
+    }
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
 
-        /* Pulse Animation */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+    /* Hazy Pulse for Red Overlay */
+    @keyframes hazyPulse {
+      0% {
+        background-color: rgba(255, 0, 0, 0.1);
+      }
+      50% {
+        background-color: rgba(255, 0, 0, 0.3);
+      }
+      100% {
+        background-color: rgba(255, 0, 0, 0.1);
+      }
+    }
 
-        .pulse { animation: pulse 0.5s ease-in-out; }
+    /* Pulse Countdown Numbers */
+    @keyframes pulseCountdown {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
 
-        /* Shake Animation */
-        @keyframes shake {
-            0%, 100% { transform: translate(0); }
-            25% { transform: translate(-5px, -5px) rotate(-5deg); }
-            75% { transform: translate(5px, 5px) rotate(5deg); }
-        }
+    /* Dynamic Background Movement */
+    @keyframes moveBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
-        .shake { animation: shake 0.5s ease-in-out; }
+    /* Particle Effects Container */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Ensure particles are behind other elements */
+    }
 
-        /* Hazy Pulse for Red Overlay */
-        @keyframes hazyPulse {
-            0% { background-color: rgba(255, 0, 0, 0.1); }
-            50% { background-color: rgba(255, 0, 0, 0.3); }
-            100% { background-color: rgba(255, 0, 0, 0.1); }
-        }
+    /* Responsive Typography */
+    @media (max-width: 600px) {
+      #message {
+        font-size: 1em;
+      }
+      #heart-container {
+        font-size: 1.5em;
+      }
+      #countdown-overlay {
+        font-size: 5em;
+      }
+    }
 
-        /* Pulse Countdown Numbers */
-        @keyframes pulseCountdown {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.7; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        /* Dynamic Background Movement */
-        @keyframes moveBackground {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Particle Effects Container */
-        #particles-js {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1; /* Ensure particles are behind other elements */
-        }
-
-        /* Responsive Typography */
-        @media (max-width: 600px) {
-            #message {
-                font-size: 1em;
-            }
-            #heart-container {
-                font-size: 1.5em;
-            }
-            #countdown-overlay {
-                font-size: 5em;
-            }
-        }
-
-        /* Ensure countdown overlay is always centered */
-        @media (orientation: landscape) {
-            #countdown-overlay {
-                font-size: 8em;
-            }
-        }
-    </style>
+    /* Ensure countdown overlay is always centered */
+    @media (orientation: landscape) {
+      #countdown-overlay {
+        font-size: 8em;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Particle Effects Background -->
-    <div id="particles-js"></div>
+  <!-- Particle Effects Background -->
+  <div id="particles-js"></div>
 
-    <!-- Heart Container -->
-    <div id="heart-container">
-        <!-- Displaying five hearts initially -->
-        <span class="heart" id="heart1">&#9829;</span>
-        <span class="heart" id="heart2">&#9829;</span>
-        <span class="heart" id="heart3">&#9829;</span>
-        <span class="heart" id="heart4">&#9829;</span>
-        <span class="heart" id="heart5">&#9829;</span>
-    </div>
+  <!-- Heart Container -->
+  <div id="heart-container">
+    <!-- Displaying five hearts initially -->
+    <span class="heart" id="heart1">&#9829;</span>
+    <span class="heart" id="heart2">&#9829;</span>
+    <span class="heart" id="heart3">&#9829;</span>
+    <span class="heart" id="heart4">&#9829;</span>
+    <span class="heart" id="heart5">&#9829;</span>
+  </div>
 
-    <!-- Progress Bar Container -->
-    <div id="progress-container">
-        <div id="progress-bar"></div>
-        <div id="progress-text">0%</div>
-    </div>
+  <!-- Progress Bar Container -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+    <div id="progress-text">0%</div>
+  </div>
 
-    <!-- Message Display -->
-    <div id="message">Keep going!</div>
+  <!-- Message Display -->
+  <div id="message">Keep going!</div>
 
-    <!-- Game Over Overlay -->
-    <div id="game-over-overlay">
-        <h2>Game Over</h2>
-        <button id="restart-button" onclick="restartGame()">Try Again</button>
-    </div>
+  <!-- Game Over Overlay -->
+  <div id="game-over-overlay">
+    <h2>Game Over</h2>
+    <button id="restart-button" onclick="restartGame()">Try Again</button>
+  </div>
 
-    <!-- Red Overlay for Negative Feedback -->
-    <div id="red-overlay"></div>
+  <!-- Red Overlay for Negative Feedback -->
+  <div id="red-overlay"></div>
 
-    <!-- Countdown Overlay -->
-    <div id="countdown-overlay"></div>
+  <!-- Countdown Overlay -->
+  <div id="countdown-overlay"></div>
 
-    <!-- Audio Elements with Preload -->
-    <audio id="ding-sound" src="Ding.m4a" preload="auto"></audio>
-    <audio id="buzz-sound" src="Buzz.m4a" preload="auto"></audio>
+  <!-- Audio Elements with Preload -->
+  <audio id="ding-sound" src="Ding.m4a" preload="auto"></audio>
+  <audio id="buzz-sound" src="Buzz.m4a" preload="auto"></audio>
 
-    <script>
-        // JavaScript Code
+  <script>
+    /* ==============================
+       Global Variables & DOM Hooks
+    ============================== */
 
-        let progress = 0;
-        let currentDisplayValue = 0;
-        let hearts = 5;
-        let nightMode = false;
-        let countdownTimer = null;
-        let countdownNumber = 3;
-        let countdownInterval = null;
-        let audioContext = null;
-        let isBuzzPlaying = false; // Flag to track buzz sound state
+    let progress = 0;
+    let currentDisplayValue = 0;
+    let hearts = 5;
+    let nightMode = false;
+    let countdownTimer = null;
+    let countdownNumber = 3;
+    let countdownInterval = null;
+    let audioContext = null;
+    let isBuzzPlaying = false; // Flag to track buzz sound state
 
-        // Get DOM elements
-        const progressBar = document.getElementById('progress-bar');
-        const progressText = document.getElementById('progress-text');
-        const message = document.getElementById('message');
-        const progressContainer = document.getElementById('progress-container');
-        const dingSound = document.getElementById('ding-sound');
-        const buzzSound = document.getElementById('buzz-sound');
-        const heartsArray = [
-            document.getElementById('heart1'),
-            document.getElementById('heart2'),
-            document.getElementById('heart3'),
-            document.getElementById('heart4'),
-            document.getElementById('heart5')
-        ];
-        const gameOverOverlay = document.getElementById('game-over-overlay');
-        const restartButton = document.getElementById('restart-button');
-        const countdownOverlay = document.getElementById('countdown-overlay');
-        const redOverlay = document.getElementById('red-overlay');
+    const progressBar = document.getElementById("progress-bar");
+    const progressText = document.getElementById("progress-text");
+    const message = document.getElementById("message");
+    const progressContainer = document.getElementById("progress-container");
+    const dingSound = document.getElementById("ding-sound");
+    const buzzSound = document.getElementById("buzz-sound");
+    const heartsArray = [
+      document.getElementById("heart1"),
+      document.getElementById("heart2"),
+      document.getElementById("heart3"),
+      document.getElementById("heart4"),
+      document.getElementById("heart5"),
+    ];
+    const gameOverOverlay = document.getElementById("game-over-overlay");
+    const restartButton = document.getElementById("restart-button");
+    const countdownOverlay = document.getElementById("countdown-overlay");
+    const redOverlay = document.getElementById("red-overlay");
 
-        // Initialize audio context
-        function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
-            
-            // Prime the audio elements
-            dingSound.load();
-            buzzSound.load();
+    /* =======================
+       Audio Initialization
+    ======================= */
+
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
+      // Prime the audio elements
+      dingSound.load();
+      buzzSound.load();
+    }
+
+    async function playSound(sound) {
+      try {
+        if (!audioContext) {
+          initAudio();
         }
 
-        // Function to play sound with proper error handling
-        async function playSound(sound) {
-            try {
-                if (!audioContext) {
-                    initAudio();
-                }
-
-                // Stop sound if it's currently playing
-                if (!sound.paused) {
-                    sound.pause();
-                    sound.currentTime = 0;
-                }
-
-                // If the sound is buzz, ensure only one play at a time
-                if (sound === buzzSound) {
-                    if (isBuzzPlaying) return; // Exit if buzz is still playing
-                    isBuzzPlaying = true;
-                    sound.addEventListener('ended', () => {
-                        isBuzzPlaying = false;
-                    }, { once: true });
-                }
-
-                const playPromise = sound.play();
-                if (playPromise !== undefined) {
-                    await playPromise;
-                }
-            } catch (error) {
-                console.error('Error playing sound:', error);
-            }
+        // Stop sound if it's currently playing
+        if (!sound.paused) {
+          sound.pause();
+          sound.currentTime = 0;
         }
 
-        // Toggle Night Mode
-        function toggleNightMode() {
-            nightMode = !nightMode;
-            document.body.classList.toggle('night-mode', nightMode);
-            document.body.classList.remove('red-mode');
-            progressBar.style.backgroundColor = nightMode ? '#4A90E2' : 'var(--primary-color)';
-            updateBackgroundColor();
-        }
-
-        // Animate Progress Text
-        function animateProgress(oldValue, newValue) {
-            const step = oldValue < newValue ? 1 : -1;
-            let current = oldValue;
-            const interval = setInterval(() => {
-                current += step;
-                progressText.textContent = Math.max(0, current) + '%';
-                if (current === newValue || current < 0) {
-                    clearInterval(interval);
-                }
-            }, 50);
-        }
-
-        // Update Background Color Based on Progress
-        function updateBackgroundColor() {
-            const hue = (progress / 100) * 120; // 0 (red) to 120 (green)
-            document.body.style.backgroundColor = `hsl(${hue}, 70%, 90%)`;
-        }
-
-        // Update Progress Function
-        function updateProgress(change, silent = false) {
-            if (hearts === 0) return;
-
-            const oldProgress = progress;
-            progress += change;
-
-            if (progress > 100) progress = 100;
-            if (progress < 0) progress = 0;
-
-            progressBar.style.width = progress + '%';
-            animateProgress(currentDisplayValue, progress);
-            currentDisplayValue = progress;
-
-            // Update Background Color
-            updateBackgroundColor();
-
-            if (progress === 100) {
-                message.textContent = 'You did it!';
-                return;
-            }
-
-            if (!silent) {
-                if (change > 0) {
-                    document.body.classList.remove('red-mode');
-                    progressBar.style.backgroundColor = nightMode ? '#4A90E2' : 'var(--primary-color)';
-                    progressContainer.classList.add('pulse');
-                    message.classList.add('pulse');
-                    message.textContent = 'Great job! Keep going!';
-                    playSound(dingSound);
-                } else if (change < 0) {
-                    document.body.classList.add('red-mode');
-                    progressBar.style.backgroundColor = '';
-                    progressContainer.classList.add('shake');
-                    message.classList.add('shake');
-                    message.textContent = 'Careful, focus!';
-                    playSound(buzzSound);
-                    loseHeart();
-                } else {
-                    message.textContent = '';
-                }
-            }
-
-            // Remove Animations After Completion
-            setTimeout(() => {
-                progressContainer.classList.remove('pulse');
-                message.classList.remove('pulse');
-                progressContainer.classList.remove('shake');
-                message.classList.remove('shake');
-            }, 500);
-        }
-
-        // Lose Heart Function with Fade-Out Animation
-        function loseHeart() {
-            if (hearts > 0) {
-                hearts--;
-                const heart = heartsArray[hearts];
-                heart.classList.add('fade-out');
-                // Remove the class after animation completes to allow re-animation on restart
-                heart.addEventListener('animationend', () => {
-                    heart.classList.add('greyed-out');
-                    heart.classList.remove('fade-out');
-                }, { once: true });
-            }
-            if (hearts === 0) {
-                gameOver();
-            }
-        }
-
-        // Game Over Function
-        function gameOver() {
-            gameOverOverlay.classList.add('show');
-            message.textContent = '';
-        }
-
-        // Restart Game Function with Smooth UI Reset
-        function restartGame() {
-            cancelCountdown();
-            progress = 0;
-            currentDisplayValue = 0;
-            hearts = 5;
-            progressBar.style.width = '0%';
-            progressText.textContent = '0%';
-            message.textContent = 'Keep going!';
-            gameOverOverlay.classList.remove('show');
-            document.body.classList.remove('red-mode');
-            updateBackgroundColor();
-
-            // Reset all hearts to active state
-            heartsArray.forEach(heart => {
-                heart.classList.remove('greyed-out');
-                heart.classList.remove('fade-out');
-            });
-
-            // Reset audio states
-            isBuzzPlaying = false;
-            dingSound.pause(); dingSound.currentTime = 0;
-            buzzSound.pause(); buzzSound.currentTime = 0;
-        }
-
-        // Start Countdown Function with Overlay Animations
-        function startCountdown() {
-            countdownNumber = 3;
-            countdownOverlay.textContent = countdownNumber;
-            countdownOverlay.style.display = 'block';
-            redOverlay.style.display = 'block';
-            countdownTimer = true;
-
-            countdownInterval = setInterval(() => {
-                countdownNumber--;
-                if (countdownNumber > 0) {
-                    countdownOverlay.textContent = countdownNumber;
-                } else {
-                    clearInterval(countdownInterval);
-                    countdownOverlay.style.display = 'none';
-                    redOverlay.style.display = 'none';
-                    countdownTimer = null;
-                    updateProgress(-5); // Trigger buzz
-                }
-            }, 1000);
-        }
-
-        // Cancel Countdown Function
-        function cancelCountdown() {
-            clearInterval(countdownInterval);
-            countdownOverlay.style.display = 'none';
-            redOverlay.style.display = 'none';
-            countdownTimer = null;
-        }
-
-        // Event Listener for Keydown Events
-        document.addEventListener('keydown', (event) => {
-            if (hearts > 0 && progress < 100 && event.key === ' ') {
-                event.preventDefault();
-                updateProgress(5);
-                progressContainer.classList.add('highlight');
-                setTimeout(() => progressContainer.classList.remove('highlight'), 200);
-            }
-            if (hearts > 0 && progress > 0 && event.key === 'ArrowLeft') {
-                event.preventDefault();
-                if (!countdownTimer) {
-                    startCountdown();
-                } else {
-                    cancelCountdown();
-                }
-            }
-            if (event.key === '+') {
-                updateProgress(5, true);
-            }
-            if (event.key === '-') {
-                updateProgress(-5, true);
-            }
-            if (event.key === 'F12') {
-                toggleNightMode();
-            }
-            if (hearts === 0 && event.key === ' ') {
-                restartGame();
-            }
-        });
-
-        // Initialize Audio Elements
-        dingSound.load();
-        buzzSound.load();
-
-        // Initialize Particles.js
-        particlesJS('particles-js', {
-            "particles": {
-                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#ff69b4" }, // Match the primary color
-                "shape": {
-                    "type": "circle",
-                    "stroke": { "width": 0, "color": "#000000" },
-                },
-                "opacity": {
-                    "value": 0.5,
-                    "random": true,
-                },
-                "size": {
-                    "value": 3,
-                    "random": true,
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 2,
-                    "direction": "none",
-                    "out_mode": "out",
-                }
+        // If the sound is buzz, ensure only one play at a time
+        if (sound === buzzSound) {
+          if (isBuzzPlaying) return;
+          isBuzzPlaying = true;
+          sound.addEventListener(
+            "ended",
+            () => {
+              isBuzzPlaying = false;
             },
-            "interactivity": {
-                "events": {
-                    "onhover": { "enable": false },
-                    "onclick": { "enable": false }
-                }
-            },
-            "retina_detect": true
-        });
-    </script>
+            { once: true }
+          );
+        }
+
+        const playPromise = sound.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
+      } catch (error) {
+        console.error("Error playing sound:", error);
+      }
+    }
+
+    /* ========================================
+       Background & Night Mode Configuration
+    ======================================== */
+
+    function setBackground() {
+      // Immediately switch the overall background & animation
+      if (nightMode) {
+        // Night Mode background
+        document.body.style.background = `linear-gradient(270deg, var(--background-dark), #2e2e2e)`;
+        document.body.style.backgroundSize = "400% 400%";
+        // Slightly different animation speed if you prefer
+        document.body.style.animation = "moveBackground 20s ease infinite";
+
+        // For the progress bar, use a night-specific gradient
+        progressBar.style.background = `linear-gradient(90deg, #4A90E2, #2C4E6B)`;
+        // Make sure text color is updated
+        progressText.style.color = "var(--text-dark)";
+      } else {
+        // Day Mode background: keep the hue-based approach or a static gradient
+        const hue = (progress / 100) * 120; // 0 (red) to 120 (green)
+        document.body.style.background = `hsl(${hue}, 70%, 90%)`;
+        document.body.style.backgroundSize = "cover";
+        document.body.style.animation = ""; // Remove night-mode animation
+
+        // Day gradient for progress bar
+        progressBar.style.background = `linear-gradient(90deg, var(--primary-color), var(--secondary-color))`;
+        progressText.style.color = "var(--text-light)";
+      }
+    }
+
+    function toggleNightMode() {
+      nightMode = !nightMode;
+      document.body.classList.toggle("night-mode", nightMode);
+      document.body.classList.remove("red-mode");
+
+      // Immediately update background
+      setBackground();
+    }
+
+    /* ===========================
+       Progress Bar Animations
+    =========================== */
+
+    function animateProgress(oldValue, newValue) {
+      const step = oldValue < newValue ? 1 : -1;
+      let current = oldValue;
+      const interval = setInterval(() => {
+        current += step;
+        progressText.textContent = Math.max(0, current) + "%";
+        if (current === newValue || current < 0) {
+          clearInterval(interval);
+        }
+      }, 50);
+    }
+
+    /* ===========================
+       Progress & Feedback Logic
+    =========================== */
+
+    function updateProgress(change, silent = false) {
+      if (hearts === 0) return;
+
+      const oldProgress = progress;
+      progress += change;
+
+      if (progress > 100) progress = 100;
+      if (progress < 0) progress = 0;
+
+      progressBar.style.width = progress + "%";
+      animateProgress(currentDisplayValue, progress);
+      currentDisplayValue = progress;
+
+      // Immediately update background so day mode can still have dynamic hue
+      // or night mode can keep a steady dark background.
+      setBackground();
+
+      if (progress === 100) {
+        message.textContent = "You did it!";
+        return;
+      }
+
+      if (!silent) {
+        if (change > 0) {
+          // Correct/Positive feedback
+          document.body.classList.remove("red-mode");
+          progressContainer.classList.add("pulse");
+          message.classList.add("pulse");
+          message.textContent = "Great job! Keep going!";
+          playSound(dingSound);
+
+          // For night mode, set a distinct gradient if you like
+          if (nightMode) {
+            progressBar.style.background = `linear-gradient(90deg, #4A90E2, #2C4E6B)`;
+          } else {
+            progressBar.style.background = `linear-gradient(90deg, var(--primary-color), var(--secondary-color))`;
+          }
+        } else if (change < 0) {
+          // Incorrect/Negative feedback
+          document.body.classList.add("red-mode");
+          progressBar.style.background = ""; // Let .red-mode handle the color
+          progressContainer.classList.add("shake");
+          message.classList.add("shake");
+          message.textContent = "Careful, focus!";
+          playSound(buzzSound);
+          loseHeart();
+        } else {
+          message.textContent = "";
+        }
+      }
+
+      // Remove Animations After Completion
+      setTimeout(() => {
+        progressContainer.classList.remove("pulse");
+        message.classList.remove("pulse");
+        progressContainer.classList.remove("shake");
+        message.classList.remove("shake");
+      }, 500);
+    }
+
+    function loseHeart() {
+      if (hearts > 0) {
+        hearts--;
+        const heart = heartsArray[hearts];
+        heart.classList.add("fade-out");
+        heart.addEventListener(
+          "animationend",
+          () => {
+            heart.classList.add("greyed-out");
+            heart.classList.remove("fade-out");
+          },
+          { once: true }
+        );
+      }
+      if (hearts === 0) {
+        gameOver();
+      }
+    }
+
+    function gameOver() {
+      gameOverOverlay.classList.add("show");
+      message.textContent = "";
+    }
+
+    function restartGame() {
+      cancelCountdown();
+      progress = 0;
+      currentDisplayValue = 0;
+      hearts = 5;
+      progressBar.style.width = "0%";
+      progressText.textContent = "0%";
+      message.textContent = "Keep going!";
+      gameOverOverlay.classList.remove("show");
+      document.body.classList.remove("red-mode");
+
+      // Reset hearts
+      heartsArray.forEach((heart) => {
+        heart.classList.remove("greyed-out");
+        heart.classList.remove("fade-out");
+      });
+
+      // Reset audio states
+      isBuzzPlaying = false;
+      dingSound.pause();
+      dingSound.currentTime = 0;
+      buzzSound.pause();
+      buzzSound.currentTime = 0;
+
+      // Immediately update background
+      setBackground();
+    }
+
+    /* ===========================
+       Countdown Logic
+    =========================== */
+
+    function startCountdown() {
+      countdownNumber = 3;
+      countdownOverlay.textContent = countdownNumber;
+      countdownOverlay.style.display = "block";
+      redOverlay.style.display = "block";
+      countdownTimer = true;
+
+      countdownInterval = setInterval(() => {
+        countdownNumber--;
+        if (countdownNumber > 0) {
+          countdownOverlay.textContent = countdownNumber;
+        } else {
+          clearInterval(countdownInterval);
+          countdownOverlay.style.display = "none";
+          redOverlay.style.display = "none";
+          countdownTimer = null;
+          updateProgress(-5); // Trigger negative feedback
+        }
+      }, 1000);
+    }
+
+    function cancelCountdown() {
+      clearInterval(countdownInterval);
+      countdownOverlay.style.display = "none";
+      redOverlay.style.display = "none";
+      countdownTimer = null;
+    }
+
+    /* ===========================
+       Event Listeners
+    =========================== */
+
+    document.addEventListener("keydown", (event) => {
+      if (hearts > 0 && progress < 100 && event.key === " ") {
+        event.preventDefault();
+        updateProgress(5);
+        progressContainer.classList.add("highlight");
+        setTimeout(() => progressContainer.classList.remove("highlight"), 200);
+      }
+      if (hearts > 0 && progress > 0 && event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (!countdownTimer) {
+          startCountdown();
+        } else {
+          cancelCountdown();
+        }
+      }
+      if (event.key === "+") {
+        updateProgress(5, true);
+      }
+      if (event.key === "-") {
+        updateProgress(-5, true);
+      }
+      if (event.key === "F12") {
+        toggleNightMode();
+      }
+      if (hearts === 0 && event.key === " ") {
+        restartGame();
+      }
+    });
+
+    /* ===========================
+       Initialization
+    =========================== */
+
+    // Preload audio
+    dingSound.load();
+    buzzSound.load();
+
+    // Initialize Particles.js
+    particlesJS("particles-js", {
+      particles: {
+        number: {
+          value: 50,
+          density: {
+            enable: true,
+            value_area: 800,
+          },
+        },
+        color: {
+          value: "#ff69b4", // Match the primary color
+        },
+        shape: {
+          type: "circle",
+          stroke: {
+            width: 0,
+            color: "#000000",
+          },
+        },
+        opacity: {
+          value: 0.5,
+          random: true,
+        },
+        size: {
+          value: 3,
+          random: true,
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: "none",
+          out_mode: "out",
+        },
+      },
+      interactivity: {
+        events: {
+          onhover: { enable: false },
+          onclick: { enable: false },
+        },
+      },
+      retina_detect: true,
+    });
+  </script>
 </body>
 </html>
