@@ -11,9 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <style>
     /* Reset and Box-Sizing */
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -38,11 +36,12 @@
       --overlay-red: rgba(255, 0, 0, 0.1);
       --countdown-color: red;
       --countdown-shadow: 0 0 20px red;
+      --countdown-night-color: purple;
+      --countdown-night-shadow: 0 0 20px purple;
     }
 
     /* General Styles */
-    html,
-    body {
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -55,11 +54,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(
-        270deg,
-        var(--background-light),
-        #e0e0e0
-      );
+      background: linear-gradient(270deg, var(--background-light), #e0e0e0);
       background-size: 400% 400%;
       animation: moveBackground 15s ease infinite;
       transition: background 0.5s, color 0.5s;
@@ -67,7 +62,7 @@
       position: relative;
     }
 
-    /* Night Mode */
+    /* Night Mode Styles */
     .night-mode {
       color: var(--text-dark);
     }
@@ -89,13 +84,8 @@
     #progress-bar {
       height: 100%;
       width: 0;
-      background: linear-gradient(
-        90deg,
-        var(--primary-color),
-        var(--secondary-color)
-      );
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        background-color 0.5s;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;
     }
 
     /* Progress Text */
@@ -264,7 +254,7 @@
       opacity: 0;
     }
 
-    /* Pulse Animation */
+    /* Pulse Animation for Day Mode */
     @keyframes pulse {
       0% {
         transform: scale(1);
@@ -280,10 +270,9 @@
       animation: pulse 0.5s ease-in-out;
     }
 
-    /* Shake Animation */
+    /* Shake Animation for Day Mode */
     @keyframes shake {
-      0%,
-      100% {
+      0%, 100% {
         transform: translate(0);
       }
       25% {
@@ -366,6 +355,49 @@
     @media (orientation: landscape) {
       #countdown-overlay {
         font-size: 8em;
+      }
+    }
+
+    /* Night Mode Feedback Animations */
+    .night-mode .pulse {
+      animation: pulseNight 0.5s ease-in-out;
+    }
+
+    .night-mode .shake {
+      animation: shakeNight 0.5s ease-in-out;
+    }
+
+    /* Pulse Animation for Night Mode */
+    @keyframes pulseNight {
+      0% {
+        transform: scale(1);
+        color: var(--countdown-night-color);
+        text-shadow: 0 0 10px var(--countdown-night-shadow);
+      }
+      50% {
+        transform: scale(1.2);
+        color: var(--countdown-night-color);
+        text-shadow: 0 0 20px var(--countdown-night-shadow);
+      }
+      100% {
+        transform: scale(1);
+        color: var(--countdown-night-color);
+        text-shadow: 0 0 10px var(--countdown-night-shadow);
+      }
+    }
+
+    /* Shake Animation for Night Mode */
+    @keyframes shakeNight {
+      0%, 100% {
+        transform: translate(0);
+      }
+      25% {
+        transform: translate(-5px, -5px) rotate(-5deg);
+        text-shadow: 0 0 10px var(--countdown-night-shadow);
+      }
+      75% {
+        transform: translate(5px, 5px) rotate(5deg);
+        text-shadow: 0 0 10px var(--countdown-night-shadow);
       }
     }
   </style>
@@ -510,16 +542,22 @@
         progressBar.style.background = `linear-gradient(90deg, #4A90E2, #2C4E6B)`;
         // Make sure text color is updated
         progressText.style.color = "var(--text-dark)";
+
+        // Update Particles for Night Mode
+        initializeParticles(true);
       } else {
         // Day Mode background: keep the hue-based approach or a static gradient
         const hue = (progress / 100) * 120; // 0 (red) to 120 (green)
         document.body.style.background = `hsl(${hue}, 70%, 90%)`;
         document.body.style.backgroundSize = "cover";
-        document.body.style.animation = ""; // Remove night-mode animation
+        document.body.style.animation = "moveBackground 15s ease infinite";
 
         // Day gradient for progress bar
         progressBar.style.background = `linear-gradient(90deg, var(--primary-color), var(--secondary-color))`;
         progressText.style.color = "var(--text-light)";
+
+        // Update Particles for Day Mode
+        initializeParticles(false);
       }
     }
 
@@ -528,7 +566,7 @@
       document.body.classList.toggle("night-mode", nightMode);
       document.body.classList.remove("red-mode");
 
-      // Immediately update background
+      // Immediately update background and particles
       setBackground();
     }
 
@@ -730,6 +768,59 @@
     });
 
     /* ===========================
+       Particle Configuration
+    =========================== */
+
+    let currentParticleMode = "day"; // Track current mode to prevent redundant initializations
+
+    function initializeParticles(isNightMode) {
+      if (currentParticleMode === (isNightMode ? "night" : "day")) {
+        return; // Already initialized for this mode
+      }
+
+      // Destroy existing particles
+      if (window.pJSDom && window.pJSDom.length > 0) {
+        window.pJSDom[0].pJS.fn.vendors.destroypJS();
+        window.pJSDom = [];
+      }
+
+      // Define particle colors based on mode
+      const particleColor = isNightMode ? "#8A2BE2" : "#ff69b4"; // Purple for night, hotpink for day
+
+      // Initialize Particles.js with mode-specific configuration
+      particlesJS("particles-js", {
+        particles: {
+          number: { value: 50, density: { enable: true, value_area: 800 } },
+          color: { value: particleColor },
+          shape: {
+            type: "circle",
+            stroke: { width: 0, color: "#000000" },
+          },
+          opacity: {
+            value: 0.5,
+            random: true,
+          },
+          size: {
+            value: 3,
+            random: true,
+          },
+          move: {
+            enable: true,
+            speed: 2,
+            direction: "none",
+            out_mode: "out",
+          },
+        },
+        interactivity: {
+          events: { onhover: { enable: false }, onclick: { enable: false } },
+        },
+        retina_detect: true,
+      });
+
+      currentParticleMode = isNightMode ? "night" : "day";
+    }
+
+    /* ===========================
        Initialization
     =========================== */
 
@@ -737,49 +828,8 @@
     dingSound.load();
     buzzSound.load();
 
-    // Initialize Particles.js
-    particlesJS("particles-js", {
-      particles: {
-        number: {
-          value: 50,
-          density: {
-            enable: true,
-            value_area: 800,
-          },
-        },
-        color: {
-          value: "#ff69b4", // Match the primary color
-        },
-        shape: {
-          type: "circle",
-          stroke: {
-            width: 0,
-            color: "#000000",
-          },
-        },
-        opacity: {
-          value: 0.5,
-          random: true,
-        },
-        size: {
-          value: 3,
-          random: true,
-        },
-        move: {
-          enable: true,
-          speed: 2,
-          direction: "none",
-          out_mode: "out",
-        },
-      },
-      interactivity: {
-        events: {
-          onhover: { enable: false },
-          onclick: { enable: false },
-        },
-      },
-      retina_detect: true,
-    });
+    // Initialize Particles for Day Mode initially
+    initializeParticles(false);
   </script>
 </body>
 </html>
